@@ -5,15 +5,20 @@ const path = require("path");
 const socketio = require("socket.io");
 
 const app = express();
-const server = http.createServer(app);
-const io = socketio(server);
+const server = http.createServer(app); //socketio demands
+const io = socketio(server); //socketio demands
 
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "../public")));
+let count = 0;
 
-io.on("connection", () => {
-  console.log("New connected added");
+io.on("connection", socket => {
+  socket.emit("message", "Welcome");
+  socket.emit("countUpdated", count);
+  socket.on("sendMessage", text => {
+    io.emit("message", text);
+  });
 });
 
 app.get("/", (req, res) => {
