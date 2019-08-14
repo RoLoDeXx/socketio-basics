@@ -15,9 +15,15 @@ let count = 0;
 
 io.on("connection", socket => {
   socket.emit("message", "Welcome");
+  socket.broadcast.emit("message", "Abcd has joined the chat");
+
   socket.emit("countUpdated", count);
   socket.on("sendMessage", text => {
     io.emit("message", text);
+  });
+
+  socket.on("disconnect", () => {
+    io.emit("message", "User has left the chat");
   });
 });
 
