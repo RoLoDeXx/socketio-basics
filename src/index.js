@@ -25,6 +25,14 @@ io.on("connection", socket => {
   socket.on("disconnect", () => {
     io.emit("message", "User has left the chat");
   });
+
+  socket.on("sendLocation", response => {
+    let { latitude, longitude } = response;
+    io.emit(
+      "message",
+      "https://google.com/maps?q=" + latitude + "," + longitude
+    );
+  });
 });
 
 app.get("/", (req, res) => {
