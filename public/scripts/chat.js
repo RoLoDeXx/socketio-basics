@@ -1,23 +1,34 @@
 const socket = io();
 
+const $messageForm = document.querySelector("#message-form");
+const $messageFormInput = $messageForm.querySelector("input");
+const $messageFormButton = $messageForm.querySelector("button");
+const $sendLocationButton = document.querySelector("#sendLocation");
+
 socket.on("message", welcomeMessage => {
   console.log(welcomeMessage);
 });
 
-document.getElementById("submitButton").addEventListener("click", () => {
-  if (document.getElementById("message").value !== "")
-    socket.emit(
-      "sendMessage",
-      document.getElementById("message").value,
-      res => {
-        if (res) return console.log(res);
+$messageForm.addEventListener("submit", e => {
+  e.preventDefault();
 
-        console.log("Message delivered");
-      }
-    );
+  $messageFormButton.setAttribute("disabled", "disabled");
+
+  const message = e.target.elements.message.value;
+  if (message !== "")
+    socket.emit("sendMessage", message, res => {
+      $messageFormButton.removeAttribute("disabled");
+      $messageFormInput.value = "";
+      $messageFormInput.focus();
+      if (res) return console.log(res);
+
+      console.log("Message delivered");
+    });
 });
+document.get;
 
-document.getElementById("sendLocation").addEventListener("click", () => {
+$sendLocationButton.addEventListener("click", () => {
+  $sendLocationButton.setAttribute("disabled", "disabled");
   if (!navigator.geolocation) return alert("Upgrade to a newer browser");
 
   navigator.geolocation.getCurrentPosition(position => {
@@ -31,6 +42,7 @@ document.getElementById("sendLocation").addEventListener("click", () => {
         console.log(res);
       }
     );
+    $sendLocationButton.removeAttribute("disabled");
   });
 });
 
