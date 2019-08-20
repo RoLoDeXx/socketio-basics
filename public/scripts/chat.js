@@ -4,9 +4,26 @@ const $messageForm = document.querySelector("#message-form");
 const $messageFormInput = $messageForm.querySelector("input");
 const $messageFormButton = $messageForm.querySelector("button");
 const $sendLocationButton = document.querySelector("#sendLocation");
+const $messages = document.querySelector("#messages");
 
-socket.on("message", welcomeMessage => {
-  console.log(welcomeMessage);
+const locationTemplate = document.querySelector("#locationMessage-template")
+  .innerHTML;
+const messageTemplate = document.querySelector("#message-template").innerHTML;
+
+socket.on("message", message => {
+  console.log(message);
+  const html = Mustache.render(messageTemplate, {
+    message
+  });
+  $messages.insertAdjacentHTML("beforeend", html);
+});
+
+socket.on("locationMessage", location => {
+  console.log(location);
+  const html = Mustache.render(locationTemplate, {
+    url: location
+  });
+  $messages.insertAdjacentHTML("beforeend", html);
 });
 
 $messageForm.addEventListener("submit", e => {
@@ -25,9 +42,9 @@ $messageForm.addEventListener("submit", e => {
       console.log("Message delivered");
     });
 });
-document.get;
 
-$sendLocationButton.addEventListener("click", () => {
+$sendLocationButton.addEventListener("click", e => {
+  e.preventDefault();
   $sendLocationButton.setAttribute("disabled", "disabled");
   if (!navigator.geolocation) return alert("Upgrade to a newer browser");
 
@@ -44,8 +61,4 @@ $sendLocationButton.addEventListener("click", () => {
     );
     $sendLocationButton.removeAttribute("disabled");
   });
-});
-
-socket.on("sendMessage", text => {
-  console.log(text);
 });
