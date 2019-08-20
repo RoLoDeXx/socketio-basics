@@ -9,30 +9,37 @@ const app = express();
 const server = http.createServer(app); //socketio demands
 const io = socketio(server); //socketio demands
 
+const { generateMessage } = require("./utils/messages");
+
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "../public")));
 let count = 0;
 
 io.on("connection", socket => {
-  socket.emit("message", "Welcome");
-  socket.broadcast.emit("message", "Abcd has joined the chat");
+  //joining
+  socket.emit("message", generateMessage("Welcome"));
+  socket.broadcast.emit(
+    "message",
+    generateMessage("New user has joined the chat")
+  );
 
-  socket.emit("countUpdated", count);
   socket.on("sendMessage", (text, callback) => {
     const filter = new Filter();
 
     if (filter.isProfane(text))
       return callback("Chat is moderated, Please do not use curse words");
-
-    io.emit("message", text);
+    //send Text
+    io.emit("message", generateMessage(text));
     callback();
   });
 
+  //leaving
   socket.on("disconnect", () => {
-    io.emit("message", "User has left the chat");
+    io.emit("message", generateMessage("User has left the chat"));
   });
 
+  //location send
   socket.on("sendLocation", (response, callback) => {
     let { latitude, longitude } = response;
     io.emit(
