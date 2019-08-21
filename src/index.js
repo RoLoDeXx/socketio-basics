@@ -9,7 +9,10 @@ const app = express();
 const server = http.createServer(app); //socketio demands
 const io = socketio(server); //socketio demands
 
-const { generateMessage } = require("./utils/messages");
+const {
+  generateMessage,
+  generateLocationMessage
+} = require("./utils/messages");
 
 app.use(bodyParser.json());
 app.use(express.json());
@@ -44,7 +47,9 @@ io.on("connection", socket => {
     let { latitude, longitude } = response;
     io.emit(
       "locationMessage",
-      "https://google.com/maps?q=" + latitude + "," + longitude
+      generateLocationMessage(
+        "https://google.com/maps?q=" + latitude + "," + longitude
+      )
     );
     callback("Location shared");
   });

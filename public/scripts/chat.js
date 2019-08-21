@@ -11,7 +11,7 @@ const locationTemplate = document.querySelector("#locationMessage-template")
 const messageTemplate = document.querySelector("#message-template").innerHTML;
 
 socket.on("message", message => {
-  console.log(message);
+  console.log(message.text);
   const html = Mustache.render(messageTemplate, {
     message: message.text,
     createdAt: moment(message.createdAt).format("h:mm a")
@@ -20,20 +20,19 @@ socket.on("message", message => {
 });
 
 socket.on("locationMessage", location => {
-  console.log(location);
+  console.log(location.text);
   const html = Mustache.render(locationTemplate, {
-    url: location
+    url: location.url,
+    createdAt: moment(location.createdAt).format("h:mm a")
   });
   $messages.insertAdjacentHTML("beforeend", html);
 });
 
 $messageForm.addEventListener("submit", e => {
   e.preventDefault();
-
-  $messageFormButton.setAttribute("disabled", "disabled");
-
   const message = e.target.elements.message.value;
-  if (message !== "")
+  if (message !== "") {
+    $messageFormButton.setAttribute("disabled", "disabled");
     socket.emit("sendMessage", message, res => {
       $messageFormButton.removeAttribute("disabled");
       $messageFormInput.value = "";
@@ -42,6 +41,7 @@ $messageForm.addEventListener("submit", e => {
 
       console.log("Message delivered");
     });
+  }
 });
 
 $sendLocationButton.addEventListener("click", e => {
