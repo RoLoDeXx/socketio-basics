@@ -10,6 +10,10 @@ const locationTemplate = document.querySelector("#locationMessage-template")
   .innerHTML;
 const messageTemplate = document.querySelector("#message-template").innerHTML;
 
+const { username, room } = Qs.parse(location.search, {
+  ignoreQueryPrefix: true
+});
+
 socket.on("message", message => {
   console.log(message.text);
   const html = Mustache.render(messageTemplate, {
@@ -63,3 +67,5 @@ $sendLocationButton.addEventListener("click", e => {
     $sendLocationButton.removeAttribute("disabled");
   });
 });
+
+socket.emit("join", { username, room });

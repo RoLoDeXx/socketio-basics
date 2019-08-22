@@ -20,20 +20,23 @@ app.use(express.static(path.join(__dirname, "../public")));
 let count = 0;
 
 io.on("connection", socket => {
-  //joining
-  socket.emit("message", generateMessage("Welcome"));
-  socket.broadcast.emit(
-    "message",
-    generateMessage("New user has joined the chat")
-  );
+  socket.on("join", ({ username, room }) => {
+    socket.join(room);
+
+    socket.emit("message", generateMessage("Welcome"));
+    socket.broadcast
+      .to(room)
+      .emit("message", generateMessage(username + " has joined the chat"));
+  });
 
   socket.on("sendMessage", (text, callback) => {
     const filter = new Filter();
 
     if (filter.isProfane(text))
       return callback("Chat is moderated, Please do not use curse words");
+
     //send Text
-    io.emit("message", generateMessage(text));
+    io.to("cult").emit("message", generateMessage(text));
     callback();
   });
 
