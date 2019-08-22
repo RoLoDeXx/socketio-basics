@@ -25,3 +25,26 @@ const removeUser = id => {
   });
   if (index !== -1) return users.splice(index, 1)[0];
 };
+
+const getUser = id => {
+  const user = users.find(i => {
+    return i.id === id;
+  });
+
+  if (user) return user;
+  return undefined;
+};
+
+const getUsesInRoom = room => {
+  const usersInRoom = users.filter(i => {
+    return i.room === room;
+  });
+
+  return usersInRoom;
+};
+
+addUser({
+  id: 22,
+  username: "Sam",
+  room: ""
+});
