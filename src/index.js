@@ -10,6 +10,13 @@ const server = http.createServer(app); //socketio demands
 const io = socketio(server); //socketio demands
 
 const {
+  addUser,
+  removeUser,
+  getUser,
+  getUsersInRoom
+} = require("./utils/users");
+
+const {
   generateMessage,
   generateLocationMessage
 } = require("./utils/messages");
@@ -20,41 +27,68 @@ app.use(express.static(path.join(__dirname, "../public")));
 let count = 0;
 
 io.on("connection", socket => {
-  socket.on("join", ({ username, room }) => {
-    socket.join(room);
+  socket.on("join", ({ username, room }, callback) => {
+    const { error, user } = addUser({
+      id: socket.id,
+      username,
+      room
+    });
+
+    if (error) return callback(error);
+
+    socket.join(user.room);
 
     socket.emit("message", generateMessage("Welcome"));
     socket.broadcast
-      .to(room)
-      .emit("message", generateMessage(username + " has joined the chat"));
+      .to(user.room)
+      .emit(
+        "message",
+        generateMessage(user.username + " has joined the chat!")
+      );
+
+    callback();
   });
 
   socket.on("sendMessage", (text, callback) => {
     const filter = new Filter();
 
-    if (filter.isProfane(text))
-      return callback("Chat is moderated, Please do not use curse words");
+    const user = getUser(socket.id);
+    if (user) {
+      if (filter.isProfane(text))
+        return callback("Chat is moderated, Please do not use curse words");
 
-    //send Text
-    io.to("cult").emit("message", generateMessage(text));
-    callback();
+      //send Text
+      io.to(user.room).emit("message", generateMessage(text));
+      callback();
+    }
   });
 
   //leaving
   socket.on("disconnect", () => {
-    io.emit("message", generateMessage("User has left the chat"));
+    let user = removeUser(socket.id);
+
+    if (user) {
+      io.to(user.room).emit(
+        "message",
+        generateMessage(user.username + " has left the chat!")
+      );
+    }
   });
 
   //location send
+
   socket.on("sendLocation", (response, callback) => {
-    let { latitude, longitude } = response;
-    io.emit(
-      "locationMessage",
-      generateLocationMessage(
-        "https://google.com/maps?q=" + latitude + "," + longitude
-      )
-    );
-    callback("Location shared");
+    const user = getUser(socket.id);
+    if (user) {
+      let { latitude, longitude } = response;
+      io.to(user.room).emit(
+        "locationMessage",
+        generateLocationMessage(
+          "https://google.com/maps?q=" + latitude + "," + longitude
+        )
+      );
+      callback("Location shared");
+    }
   });
 });
 

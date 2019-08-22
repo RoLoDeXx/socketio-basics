@@ -35,7 +35,7 @@ const getUser = id => {
   return undefined;
 };
 
-const getUsesInRoom = room => {
+const getUsersInRoom = room => {
   const usersInRoom = users.filter(i => {
     return i.room === room;
   });
@@ -43,8 +43,9 @@ const getUsesInRoom = room => {
   return usersInRoom;
 };
 
-addUser({
-  id: 22,
-  username: "Sam",
-  room: ""
-});
+module.exports = {
+  addUser,
+  removeUser,
+  getUser,
+  getUsersInRoom
+};
