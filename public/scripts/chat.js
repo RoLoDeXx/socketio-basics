@@ -15,22 +15,39 @@ const { username, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true
 });
 
+const autoScroll = () => {
+  // const newMessage = $messages.lastElementChild;
+  // const newMessageStyle = getComputedStyle(newMessage);
+  // const newMessageMargin = parseInt(newMessageStyle.marginBotton);
+  // const newMessageHeight = newMessage.offsetHeight + newMessageMargin;
+
+  // const visibleHeight = $messages.offsetHeight;
+  // const containerHeight = $messages.scrollHeight;
+  // const scrollOffset = $messages.scrollTop + visibleHeight;
+
+  // if (containerHeight - newMessageHeight <= scrollOffset) {
+  //   $messages.scrollTop = $messages.scrollHeight;
+  // }
+
+  $messages.scrollTop = $messages.scrollHeight;
+};
+
 socket.on("message", message => {
-  console.log(message.text);
   const html = Mustache.render(messageTemplate, {
     message: message.text,
     createdAt: moment(message.createdAt).format("h:mm a")
   });
   $messages.insertAdjacentHTML("beforeend", html);
+  autoScroll();
 });
 
 socket.on("locationMessage", location => {
-  console.log(location.text);
   const html = Mustache.render(locationTemplate, {
     url: location.url,
     createdAt: moment(location.createdAt).format("h:mm a")
   });
   $messages.insertAdjacentHTML("beforeend", html);
+  autoScroll();
 });
 
 socket.on("roomData", ({ room, users }) => {
@@ -50,9 +67,6 @@ $messageForm.addEventListener("submit", e => {
       $messageFormButton.removeAttribute("disabled");
       $messageFormInput.value = "";
       $messageFormInput.focus();
-      if (res) return console.log(res);
-
-      console.log("Message delivered");
     });
   }
 });
