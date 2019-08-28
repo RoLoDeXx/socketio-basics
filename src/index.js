@@ -26,6 +26,10 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "../public")));
 let count = 0;
 
+app.get("/", (req, res) => {
+  res.render("index.html");
+});
+
 io.on("connection", socket => {
   socket.on("join", ({ username, room }, callback) => {
     const { error, user } = addUser({
@@ -99,10 +103,6 @@ io.on("connection", socket => {
       callback("Location shared");
     }
   });
-});
-
-app.get("/", (req, res) => {
-  res.render("index.html");
 });
 
 server.listen(process.env.PORT);

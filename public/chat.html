@@ -6,6 +6,10 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Thread</title>
     <link rel="stylesheet" href="/css/styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.2/css/all.min.css"
+    />
     <link rel="icon" href="/img/favicon.png" />
   </head>
 
@@ -18,9 +22,11 @@
         <div class="compose">
           <form action="" id="message-form">
             <input type="text" name="message" id="message" autocomplete="off" />
-            <button>Send</button>
+            <button><i class="far fa-paper-plane"></i></button>
           </form>
-          <button id="sendLocation">Send location</button>
+          <button id="sendLocation">
+            <i class="fas fa-map-pin send-location-button"></i>
+          </button>
         </div>
       </div>
     </div>
@@ -28,7 +34,7 @@
     <script id="message-template" type="text/html">
       <div class="message">
         <p>
-          <span class = "message__name">User</span>
+          <span class = "message__name">{{username}}</span>
           <span class = "message__meta">{{createdAt}}</span>
         </p>
         <p>{{message}}</p>
@@ -38,7 +44,7 @@
     <script id="locationMessage-template" type="text/html">
       <div class = "message">
         <p>
-          <span class = "message__name">User</span>
+          <span class = "message__name">{{username}}</span>
           <span class = "message__meta">{{createdAt}}</span>
         </p>
         <p><a href="{{url}}" target = "_blank">My current location</a></p>
